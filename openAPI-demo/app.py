@@ -24,8 +24,23 @@ with app.app_context():
 # --- CRUD endpoints ---
 @app.route('/api/books', methods=['GET'])
 def get_books():
-    books = Book.query.all()
-    return jsonify([b.to_dict() for b in books])
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 5, type=int)  # mặc định 5 sách mỗi trang
+
+    # Query phân trang
+    pagination = Book.query.paginate(page=page, per_page=limit, error_out=False)
+
+    # Tạo response JSON
+    response = {
+        "page": pagination.page,
+        "total_pages": pagination.pages,
+        "total_items": pagination.total,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev,
+        "items": [book.to_dict() for book in pagination.items]
+    }
+    return jsonify(response)
+
 
 @app.route('/api/books/<int:book_id>', methods=['GET'])
 def get_book(book_id):

@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Book Management API
-  description: API dùng để quản lý sách trong thư viện
-  version: 1.0.0
+  description: API dùng để quản lý sách trong thư viện, có hỗ trợ phân trang.
+  version: 1.1.0
 
 servers:
   - url: http://localhost:5000/api
@@ -11,16 +11,52 @@ servers:
 paths:
   /books:
     get:
-      summary: Lấy danh sách tất cả sách
+      summary: Lấy danh sách sách (có hỗ trợ phân trang)
+      parameters:
+        - name: page
+          in: query
+          description: Trang hiện tại (bắt đầu từ 1)
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: per_page
+          in: query
+          description: Số lượng sách trên mỗi trang
+          required: false
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
+            maximum: 100
       responses:
         '200':
-          description: Danh sách sách
+          description: Danh sách sách (có thông tin phân trang)
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  total_pages:
+                    type: integer
+                    example: 10
+                  total_items:
+                    type: integer
+                    example: 47
+                  has_next:
+                    type: boolean
+                    example: true
+                  has_prev:
+                    type: boolean
+                    example: false
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
     post:
       summary: Thêm một sách mới
       requestBody:
