@@ -21,7 +21,7 @@ paths:
             type: integer
             default: 1
             minimum: 1
-        - name: per_page
+        - name: limit
           in: query
           description: Số lượng sách trên mỗi trang
           required: false
