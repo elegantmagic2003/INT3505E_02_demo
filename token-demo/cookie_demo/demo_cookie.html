@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JWT Cookie Demo</title>
+</head>
+<body>
+  <h2>🔐 Demo JWT - Lưu bằng HttpOnly Cookie</h2>
+
+  <div>
+    <input id="username" placeholder="Username" value="kien" />
+    <input id="password" type="password" placeholder="Password" value="123" />
+    <button onclick="login()">Đăng nhập</button>
+    <button onclick="getProtected()">Truy cập route bảo vệ</button>
+  </div>
+
+  <p id="result"></p>
+
+  <script>
+    const API_URL = "http://localhost:5000";
+
+    async function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include" // rất quan trọng: cho phép gửi & nhận cookie
+      });
+
+      const data = await res.json();
+      document.getElementById("result").innerText = data.message || JSON.stringify(data);
+    }
+
+    async function getProtected() {
+      const res = await fetch(`${API_URL}/protected`, {
+        method: "GET",
+        credentials: "include" // gửi cookie tự động trong request
+      });
+
+      const data = await res.json();
+      document.getElementById("result").innerText = data.message || JSON.stringify(data);
+    }
+  </script>
+</body>
+</html>
