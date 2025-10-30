@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: Book Management API
+  description: API dùng để quản lý sách trong thư viện, có hỗ trợ phân trang.
+  version: 1.1.0
+
+servers:
+  - url: http://localhost:5000/api
+    description: Local server
+
+paths:
+  /books:
+    get:
+      summary: Lấy danh sách sách (có hỗ trợ phân trang)
+      parameters:
+        - name: page
+          in: query
+          description: Trang hiện tại (bắt đầu từ 1)
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Số lượng sách trên mỗi trang
+          required: false
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Danh sách sách (có thông tin phân trang)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  total_pages:
+                    type: integer
+                    example: 10
+                  total_items:
+                    type: integer
+                    example: 47
+                  has_next:
+                    type: boolean
+                    example: true
+                  has_prev:
+                    type: boolean
+                    example: false
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+    post:
+      summary: Thêm một sách mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        '201':
+          description: Sách đã được thêm thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+
+  /books/{id}:
+    get:
+      summary: Lấy thông tin chi tiết một sách
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Thông tin sách
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Không tìm thấy sách
+    put:
+      summary: Cập nhật thông tin sách
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+    delete:
+      summary: Xóa sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Xóa thành công
+        '404':
+          description: Không tìm thấy sách
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        year:
+          type: integer
+        genre:
+          type: string
+      example:
+        id: 1
+        title: "The Great Gatsby"
+        author: "F. Scott Fitzgerald"
+        year: 1925
+        genre: "Fiction"
+
+    BookInput:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        year:
+          type: integer
+        genre:
+          type: string
+      required:
+        - title
+        - author
