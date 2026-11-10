@@ -21,7 +21,7 @@ function main() {
     grpc.ServerCredentials.createInsecure(),
     () => {
       console.log("🚀 gRPC server running at http://0.0.0.0:50051");
-      server.start();
+      
     }
   );
 }
